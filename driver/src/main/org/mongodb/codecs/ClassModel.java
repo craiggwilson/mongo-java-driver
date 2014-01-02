@@ -32,8 +32,8 @@ public class ClassModel<T> {
     private final Class<T> theClass;
 
     //Two collections to track the fields for performance reasons
-    private final List<Field> validatedFields = new ArrayList<Field>();
-    private final Map<String, Field> validatedFieldsByName = new HashMap<String, Field>();
+    private final List<FieldModel> validatedFields = new ArrayList<FieldModel>();
+    private final Map<String, FieldModel> validatedFieldsByName = new HashMap<String, FieldModel>();
 
     public ClassModel(final Class<T> theClass) {
         this.theClass = theClass;
@@ -41,8 +41,9 @@ public class ClassModel<T> {
         for (final Field field : theClass.getDeclaredFields()) {
             String fieldName = field.getName();
             if (isValidFieldName(fieldName) && !isTransient(field.getModifiers())) {
-                this.validatedFields.add(field);
-                this.validatedFieldsByName.put(fieldName, field);
+                FieldModel fieldModel = new FieldModel(field);
+                this.validatedFields.add(fieldModel);
+                this.validatedFieldsByName.put(fieldName, fieldModel);
             }
         }
     }
@@ -55,17 +56,17 @@ public class ClassModel<T> {
         }
     }
 
-    public Collection<Field> getFields() {
+    public Collection<FieldModel> getFields() {
         //returning validatedFieldsByName.values is half as fast as simply returning this list
         return validatedFields;
     }
 
-    public Field getDeclaredField(final String fieldName) throws NoSuchFieldException {
-        Field field = validatedFieldsByName.get(fieldName);
-        if (field == null) {
+    public FieldModel getDeclaredField(final String fieldName) throws NoSuchFieldException {
+        FieldModel fieldModel = validatedFieldsByName.get(fieldName);
+        if (fieldModel == null) {
             throw new NoSuchFieldException(String.format("Field %s not found on class %s", fieldName, theClass));
         }
-        return field;
+        return fieldModel;
     }
 
     private boolean isValidFieldName(final String fieldName) {

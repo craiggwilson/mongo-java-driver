@@ -19,7 +19,6 @@ package org.mongodb.codecs;
 import org.bson.BSONWriter;
 import org.mongodb.Encoder;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,23 +47,21 @@ public class PojoEncoder<T> implements Encoder<T> {
             classModel = new ClassModel(value.getClass());
             classModelForClass.put(value.getClass(), classModel);
         }
-        for (final Field field : classModel.getFields()) {
-            encodeField(bsonWriter, value, field, field.getName());
+        for (final FieldModel field : classModel.getFields()) {
+            encodeField(bsonWriter, value, field);
         }
     }
 
     // need to cast the field
     @SuppressWarnings("unchecked")
-    private void encodeField(final BSONWriter bsonWriter, final T value, final Field field, final String fieldName) {
+    private void encodeField(final BSONWriter bsonWriter, final T value, final FieldModel field) {
         try {
-            field.setAccessible(true);
-            T fieldValue = (T) field.get(value);
-            bsonWriter.writeName(fieldName);
+            T fieldValue = (T) field.getValue(value);
+            bsonWriter.writeName(field.getName());
             encodeValue(bsonWriter, fieldValue);
-            field.setAccessible(false);
         } catch (IllegalAccessException e) {
             //TODO: this is really going to bugger up the writer if it throws an exception halfway through writing
-            throw new EncodingException("Could not encode field '" + fieldName + "' from " + value, e);
+            throw new EncodingException("Could not encode field '" + field.getName() + "' from " + value, e);
         }
     }
 

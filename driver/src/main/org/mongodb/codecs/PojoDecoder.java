@@ -20,7 +20,6 @@ import org.bson.BSONReader;
 import org.bson.BSONType;
 import org.mongodb.Decoder;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class PojoDecoder implements Decoder<Object> {
         }
         T pojo = classModel.createInstanceOfClass();
         while (reader.readBSONType() != BSONType.END_OF_DOCUMENT) {
-            Field fieldOnPojo = getPojoFieldForNextValue(reader.readName(), classModel);
+            FieldModel fieldOnPojo = getPojoFieldForNextValue(reader.readName(), classModel);
             Object decodedValue;
             if (reader.getCurrentBSONType() == BSONType.DOCUMENT && !codecs.canDecode(fieldOnPojo.getType())) {
                 decodedValue = decode(reader, fieldOnPojo.getType());
@@ -78,15 +77,15 @@ public class PojoDecoder implements Decoder<Object> {
             } else {
                 decodedValue = codecs.decode(reader);
             }
-            fieldOnPojo.setAccessible(true);
-            fieldOnPojo.set(pojo, decodedValue);
-            fieldOnPojo.setAccessible(false);
+            fieldOnPojo.getField().setAccessible(true);
+            fieldOnPojo.getField().set(pojo, decodedValue);
+            fieldOnPojo.getField().setAccessible(false);
         }
         return pojo;
     }
 
-    private <E> Map<String, E> decodeMap(final BSONReader reader, final Field fieldOnPojo) {
-        Type[] actualTypeArguments = ((ParameterizedType) fieldOnPojo.getGenericType()).getActualTypeArguments();
+    private <E> Map<String, E> decodeMap(final BSONReader reader, final FieldModel fieldOnPojo) {
+        Type[] actualTypeArguments = ((ParameterizedType) fieldOnPojo.getField().getGenericType()).getActualTypeArguments();
         Type typeOfItemsInMap = actualTypeArguments[1];
         Map<String, E> map = new HashMap<String, E>();
 
@@ -101,7 +100,7 @@ public class PojoDecoder implements Decoder<Object> {
         return map;
     }
 
-    private <E> Iterable<E> decodeIterable(final BSONReader reader, final Field fieldOnPojo) {
+    private <E> Iterable<E> decodeIterable(final BSONReader reader, final FieldModel fieldOnPojo) {
         Class<?> classOfIterable = fieldOnPojo.getType();
         if (classOfIterable.isArray()) {
             throw new DecodingException("Decoding into arrays is not supported.  Either provide a custom decoder, or use a List.");
@@ -114,7 +113,7 @@ public class PojoDecoder implements Decoder<Object> {
             collection = new ArrayList<E>();
         }
 
-        Type[] actualTypeArguments = ((ParameterizedType) fieldOnPojo.getGenericType()).getActualTypeArguments();
+        Type[] actualTypeArguments = ((ParameterizedType) fieldOnPojo.getField().getGenericType()).getActualTypeArguments();
         Type typeOfItemsInList = actualTypeArguments[0];
 
         reader.readStartArray();
@@ -140,7 +139,7 @@ public class PojoDecoder implements Decoder<Object> {
         return value;
     }
 
-    private <T> Field getPojoFieldForNextValue(final String nameOfField, final ClassModel<T> classModel) {
+    private <T> FieldModel getPojoFieldForNextValue(final String nameOfField, final ClassModel<T> classModel) {
         try {
             return classModel.getDeclaredField(nameOfField);
         } catch (NoSuchFieldException e) {
