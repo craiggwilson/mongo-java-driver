@@ -19,6 +19,12 @@ package org.mongodb.codecs;
 import org.bson.BSONReader;
 import org.bson.BSONWriter;
 import org.mongodb.CollectibleCodec;
+import org.mongodb.codecs.models.ClassModel;
+import org.mongodb.codecs.models.conventions.CompositeModelConvention;
+import org.mongodb.codecs.models.conventions.DeclaredFieldFinderConvention;
+import org.mongodb.codecs.models.conventions.ModelConvention;
+
+import java.util.Arrays;
 
 public class PojoCodec<T> implements CollectibleCodec<T> {
     private final Class<T> theClass;
@@ -51,4 +57,15 @@ public class PojoCodec<T> implements CollectibleCodec<T> {
         return theClass;
     }
 
+    public static <T> ClassModel<T> buildClassModel(final Class<T> theClass) {
+        ClassModel.Builder<T> builder = new ClassModel.Builder<T>(theClass);
+        CompositeModelConvention convention = new CompositeModelConvention(Arrays.asList(
+                                                                                        (ModelConvention) new
+                                                                                                          DeclaredFieldFinderConvention()
+                                                                                        ));
+
+        convention.apply(builder);
+
+        return builder.build();
+    }
 }

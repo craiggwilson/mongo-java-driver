@@ -19,6 +19,8 @@ package org.mongodb.codecs;
 import org.bson.BSONReader;
 import org.bson.BSONType;
 import org.mongodb.Decoder;
+import org.mongodb.codecs.models.ClassModel;
+import org.mongodb.codecs.models.FieldModel;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -59,29 +61,34 @@ public class PojoDecoder implements Decoder<Object> {
 
     @SuppressWarnings("unchecked") // bah
     private <T> T decodePojo(final BSONReader reader, final Class<T> theClass) throws IllegalAccessException {
-        ClassModel<T> classModel = fieldsForClass.get(theClass);
+        ClassModel classModel = fieldsForClass.get(theClass);
         if (classModel == null) {
-            classModel = new ClassModel<T>(theClass);
+            classModel = PojoCodec.buildClassModel(theClass);
             fieldsForClass.put(theClass, classModel);
         }
-        T pojo = classModel.createInstanceOfClass();
-        while (reader.readBSONType() != BSONType.END_OF_DOCUMENT) {
-            FieldModel fieldOnPojo = getPojoFieldForNextValue(reader.readName(), classModel);
-            Object decodedValue;
-            if (reader.getCurrentBSONType() == BSONType.DOCUMENT && !codecs.canDecode(fieldOnPojo.getType())) {
-                decodedValue = decode(reader, fieldOnPojo.getType());
-            } else if (reader.getCurrentBSONType() == BSONType.DOCUMENT) {
-                decodedValue = decodeMap(reader, fieldOnPojo);
-            } else if (reader.getCurrentBSONType() == BSONType.ARRAY) {
-                decodedValue = decodeIterable(reader, fieldOnPojo);
-            } else {
-                decodedValue = codecs.decode(reader);
+        try {
+            T pojo = (T) classModel.createInstanceOfClass();
+            while (reader.readBSONType() != BSONType.END_OF_DOCUMENT) {
+                FieldModel fieldOnPojo = getPojoFieldForNextValue(reader.readName(), classModel);
+                Object decodedValue;
+                if (reader.getCurrentBSONType() == BSONType.DOCUMENT && !codecs.canDecode(fieldOnPojo.getType())) {
+                    decodedValue = decode(reader, fieldOnPojo.getType());
+                } else if (reader.getCurrentBSONType() == BSONType.DOCUMENT) {
+                    decodedValue = decodeMap(reader, fieldOnPojo);
+                } else if (reader.getCurrentBSONType() == BSONType.ARRAY) {
+                    decodedValue = decodeIterable(reader, fieldOnPojo);
+                } else {
+                    decodedValue = codecs.decode(reader);
+                }
+                fieldOnPojo.getField().setAccessible(true);
+                fieldOnPojo.getField().set(pojo, decodedValue);
+                fieldOnPojo.getField().setAccessible(false);
             }
-            fieldOnPojo.getField().setAccessible(true);
-            fieldOnPojo.getField().set(pojo, decodedValue);
-            fieldOnPojo.getField().setAccessible(false);
+            return pojo;
         }
-        return pojo;
+        catch (InstantiationException e) {
+            throw new DecodingException(String.format("Can't create an instance of %s", theClass), e);
+        }
     }
 
     private <E> Map<String, E> decodeMap(final BSONReader reader, final FieldModel fieldOnPojo) {
@@ -139,7 +146,7 @@ public class PojoDecoder implements Decoder<Object> {
         return value;
     }
 
-    private <T> FieldModel getPojoFieldForNextValue(final String nameOfField, final ClassModel<T> classModel) {
+    private <T> FieldModel getPojoFieldForNextValue(final String nameOfField, final ClassModel classModel) {
         try {
             return classModel.getDeclaredField(nameOfField);
         } catch (NoSuchFieldException e) {

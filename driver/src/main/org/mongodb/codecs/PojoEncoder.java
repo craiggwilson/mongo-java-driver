@@ -18,6 +18,8 @@ package org.mongodb.codecs;
 
 import org.bson.BSONWriter;
 import org.mongodb.Encoder;
+import org.mongodb.codecs.models.ClassModel;
+import org.mongodb.codecs.models.FieldModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,9 +44,9 @@ public class PojoEncoder<T> implements Encoder<T> {
 
     @SuppressWarnings({"unchecked", "rawtypes"}) //bah.  maybe this isn't even correct
     private void encodePojo(final BSONWriter bsonWriter, final T value) {
-        ClassModel<T> classModel = classModelForClass.get(value.getClass());
+        ClassModel<?> classModel = classModelForClass.get(value.getClass());
         if (classModel == null) {
-            classModel = new ClassModel(value.getClass());
+            classModel = PojoCodec.buildClassModel(value.getClass());
             classModelForClass.put(value.getClass(), classModel);
         }
         for (final FieldModel field : classModel.getFields()) {
