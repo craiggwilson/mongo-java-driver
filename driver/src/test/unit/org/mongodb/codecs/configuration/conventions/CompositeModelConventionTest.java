@@ -1,8 +1,10 @@
-package org.mongodb.codecs.models.conventions;
+package org.mongodb.codecs.configuration.conventions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mongodb.codecs.models.ClassModel;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.pojo.Name;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,9 +29,9 @@ public class CompositeModelConventionTest {
 
     @Test
     public void testRunsAllConventionsInOrder() {
-        ClassModel.Builder model = new ClassModel.Builder(TestModelConvention.class);
+        ClassModelBuilder<Name> model = new ClassModelBuilder<Name>(Name.class);
 
-        subject.apply(model);
+        subject.apply(model, null);
 
         for (int i = 0; i < conventions.size(); i++) {
             assertTrue(((TestModelConvention) conventions.get(i)).getWasRun());
@@ -44,7 +46,7 @@ public class CompositeModelConventionTest {
         private int runIndex;
 
         @Override
-        public void apply(final ClassModel.Builder builder) {
+        public void apply(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
             wasRun = true;
             runIndex = counter++;
         }

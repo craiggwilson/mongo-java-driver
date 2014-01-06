@@ -1,4 +1,4 @@
-package org.mongodb.codecs.models;
+package org.mongodb.codecs.configuration;
 
 import org.junit.Test;
 

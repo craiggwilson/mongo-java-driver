@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package org.mongodb.codecs.models;
+package org.mongodb.codecs;
+
+import org.mongodb.Codec;
+import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
@@ -22,14 +25,17 @@ import java.util.regex.Pattern;
 public class FieldModel {
     private static final Pattern FIELD_NAME_REGEX_PATTERN = Pattern.compile("([a-zA-Z_][\\w$]*)");
 
+    private final Codec<Object> codec;
     private final Field field;
     private final String name;
 
-    public FieldModel(final Builder builder) {
+    // TODO: don't reference FieldModelBuilder here
+    public FieldModel(final FieldModelBuilder builder) {
         if (!isValidFieldName(builder.getName().get())) {
             throw new IllegalArgumentException(String.format("%s is not a valid mongodb field name.", builder.getName()));
         }
 
+        codec = builder.getCodec().get();
         field = builder.getField();
         name = builder.getName().get();
     }
@@ -40,6 +46,8 @@ public class FieldModel {
         field.setAccessible(false);
         return value;
     }
+
+    public Codec<Object> getCodec() { return codec; }
 
     public Field getField() { return field; }
 
@@ -61,31 +69,5 @@ public class FieldModel {
         //We need to document that fields starting with a $ will be ignored
         //and we probably need to be able to either disable this validation or make it pluggable
         return FIELD_NAME_REGEX_PATTERN.matcher(fieldName).matches();
-    }
-
-    public static class Builder {
-        private Field field;
-        private ModelBuilderValue<String> name;
-
-        public Builder(final Field field) {
-            this.field = field;
-            name = new ModelBuilderValue<String>(field.getName(), Level.DEFAULT);
-        }
-
-        public FieldModel build() {
-            return new FieldModel(this);
-        }
-
-        public Field getField() {
-            return field;
-        }
-
-        public ModelBuilderValue<String> getName() {
-            return name;
-        }
-
-        public void setName(final String name, final int level) {
-            this.name.set(name, level);
-        }
     }
 }

@@ -18,12 +18,11 @@ package org.mongodb.acceptancetest.crud.pojo;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mongodb.CollectibleCodec;
 import org.mongodb.DatabaseTestCase;
 import org.mongodb.Document;
 import org.mongodb.Fixture;
 import org.mongodb.MongoCollection;
-import org.mongodb.codecs.Codecs;
-import org.mongodb.codecs.PojoCodec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class WorkingWithPojosAcceptanceTest extends DatabaseTestCase {
         pojoCollection = Fixture.getMongoClient()
                                 .getDatabase(getDatabaseName())
                                 .getCollection(COLLECTION_NAME,
-                                               new PojoCodec<Person>(Codecs.createDefault(), Person.class));
+                                               (CollectibleCodec<Person>) codecRegistry.get(Person.class));
         pojoCollection.tools().drop();
     }
 
@@ -69,7 +68,7 @@ public class WorkingWithPojosAcceptanceTest extends DatabaseTestCase {
         MongoCollection<Address> addresses = Fixture.getMongoClient()
                                                     .getDatabase(getDatabaseName())
                                                     .getCollection("addresses",
-                                                                   new PojoCodec<Address>(Codecs.createDefault(), Address.class));
+                                                                   (CollectibleCodec<Address>) codecRegistry.get(Address.class));
         addresses.tools().drop();
 
         Address address = new Address("Address Line 1", "Town", new Postcode("W12"));

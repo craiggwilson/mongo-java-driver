@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 MongoDB, Inc.
+ * Copyright (c) 2008 - 2013 10gen, Inc. <http://10gen.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,35 @@
 
 package org.mongodb.codecs;
 
-import java.lang.reflect.Field;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.FieldModelBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-
-import static java.lang.reflect.Modifier.isTransient;
 
 public class ClassModel<T> {
-    private static final Pattern FIELD_NAME_REGEX_PATTERN = Pattern.compile("([a-zA-Z_][\\w$]*)");
-
     private final Class<T> theClass;
 
     //Two collections to track the fields for performance reasons
     private final List<FieldModel> validatedFields = new ArrayList<FieldModel>();
     private final Map<String, FieldModel> validatedFieldsByName = new HashMap<String, FieldModel>();
 
-    public ClassModel(final Class<T> theClass) {
-        this.theClass = theClass;
+    // TODO: don't want this to be referencing the builder...
+    public ClassModel(final ClassModelBuilder<T> builder) {
+        this.theClass = builder.getModelClass();
 
-        for (final Field field : theClass.getDeclaredFields()) {
-            String fieldName = field.getName();
-            if (isValidFieldName(fieldName) && !isTransient(field.getModifiers())) {
-                FieldModel fieldModel = new FieldModel(field);
-                this.validatedFields.add(fieldModel);
-                this.validatedFieldsByName.put(fieldName, fieldModel);
-            }
+        for (final FieldModelBuilder fieldModelBuilder : builder.getFields()) {
+            FieldModel fieldModel = fieldModelBuilder.build();
+            validatedFields.add(fieldModel);
+            validatedFieldsByName.put(fieldModel.getName(), fieldModel);
         }
     }
 
-    public T createInstanceOfClass() throws IllegalAccessException {
-        try {
-            return theClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new DecodingException(String.format("Can't create an instance of %s", theClass), e);
-        }
+    public T createInstanceOfClass() throws IllegalAccessException, InstantiationException {
+        return theClass.newInstance();
     }
 
     public Collection<FieldModel> getFields() {
@@ -69,10 +60,8 @@ public class ClassModel<T> {
         return fieldModel;
     }
 
-    private boolean isValidFieldName(final String fieldName) {
-        //We need to document that fields starting with a $ will be ignored
-        //and we probably need to be able to either disable this validation or make it pluggable
-        return FIELD_NAME_REGEX_PATTERN.matcher(fieldName).matches();
+    public Class<T> getModelClass() {
+        return theClass;
     }
 
     @Override

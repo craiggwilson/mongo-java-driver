@@ -1,9 +1,9 @@
-package org.mongodb.codecs.models.conventions;
+package org.mongodb.codecs.configuration.conventions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mongodb.codecs.models.ClassModel;
-import org.mongodb.codecs.models.FieldModel;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 import java.util.Collection;
 
@@ -11,21 +11,20 @@ import static org.junit.Assert.assertEquals;
 
 public class DeclaredFieldFinderConventionTest {
 
-    private ClassModel.Builder builder;
+    private ClassModelBuilder<TestClass> builder;
     private DeclaredFieldFinderConvention subject;
 
     @Before
     public void before() {
-        builder = new ClassModel.Builder(TestClass.class);
+        builder = new ClassModelBuilder<TestClass>(TestClass.class);
         subject = new DeclaredFieldFinderConvention();
-
     }
 
     @Test
     public void testFindsAllDeclaredNonStaticNonTransientFields() {
-        subject.apply(builder);
+        subject.apply(builder, null);
 
-        Collection<FieldModel.Builder> fields = builder.getFields();
+        Collection<FieldModelBuilder> fields = builder.getFields();
 
         assertEquals(2, fields.size());
     }

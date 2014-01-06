@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package org.mongodb.codecs.models.conventions;
+package org.mongodb.codecs.configuration.conventions;
 
-import org.mongodb.codecs.models.ClassModel;
-import org.mongodb.codecs.models.FieldModel;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 public abstract class VisitingModelConvention implements ModelConvention {
 
     @Override
-    public void apply(final ClassModel.Builder<?> builder) {
-        visitClass(builder);
+    public void apply(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+        visitClass(builder, codecFinder);
     }
 
-    protected void visitClass(final ClassModel.Builder<?> builder) {
-        for (FieldModel.Builder field : builder.getFields()) {
-            visitField(field);
+    protected void visitClass(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+        for (FieldModelBuilder field : builder.getFields()) {
+            visitField(field, codecFinder);
         }
     }
 
-    protected void visitField(final FieldModel.Builder builder) {
+    protected void visitField(final FieldModelBuilder builder, final CodecFinder codecFinder) {
         // do nothing
     }
 }

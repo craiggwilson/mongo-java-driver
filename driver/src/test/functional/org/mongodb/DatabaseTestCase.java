@@ -18,6 +18,11 @@ package org.mongodb;
 
 import org.junit.After;
 import org.junit.Before;
+import org.mongodb.codecs.configuration.ClassModelCodecSource;
+import org.mongodb.codecs.configuration.CodecRegistryBuilder;
+import org.mongodb.codecs.configuration.PrimitiveCodecSource;
+import org.mongodb.codecs.configuration.conventions.CodecLookupConvention;
+import org.mongodb.codecs.configuration.conventions.DeclaredFieldFinderConvention;
 
 import static org.mongodb.Fixture.getDefaultDatabase;
 import static org.mongodb.Fixture.initialiseCollection;
@@ -27,12 +32,24 @@ public class DatabaseTestCase {
     //CHECKSTYLE:OFF
     protected MongoDatabase database;
     protected MongoCollection<Document> collection;
+    protected CodecRegistry codecRegistry;
     //CHECKSTYLE:ON
 
     @Before
     public void setUp() {
         database = getDefaultDatabase();
         collection = initialiseCollection(database, getClass().getName());
+
+        CodecRegistryBuilder builder = new CodecRegistryBuilder();
+        builder.addSource(new PrimitiveCodecSource());
+
+        ClassModelCodecSource classModelSource = new ClassModelCodecSource();
+        classModelSource.addConvention(new DeclaredFieldFinderConvention());
+        classModelSource.addConvention(new CodecLookupConvention());
+        classModelSource.includeAllClasses();
+        builder.addSource(classModelSource);
+
+        codecRegistry = builder.build();
     }
 
     @After

@@ -17,17 +17,27 @@
 package org.mongodb.codecs;
 
 import org.bson.BSONReader;
+import org.bson.BSONType;
 import org.bson.BSONWriter;
 import org.mongodb.Codec;
 
 public class StringCodec implements Codec<String> {
     @Override
     public void encode(final BSONWriter bsonWriter, final String value) {
-        bsonWriter.writeString(value);
+        if (value == null) {
+            bsonWriter.writeNull();
+        } else {
+            bsonWriter.writeString(value);
+        }
     }
 
     @Override
     public String decode(final BSONReader reader) {
+        if (reader.getCurrentBSONType() == BSONType.NULL) {
+            reader.readNull();
+            return null;
+        }
+
         return reader.readString();
     }
 

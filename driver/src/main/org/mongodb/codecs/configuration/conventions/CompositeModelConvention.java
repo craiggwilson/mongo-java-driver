@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.mongodb.codecs.models.conventions;
+package org.mongodb.codecs.configuration.conventions;
 
-import org.mongodb.codecs.models.ClassModel;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.CodecFinder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,9 @@ public class CompositeModelConvention implements ModelConvention {
     }
 
     @Override
-    public void apply(final ClassModel.Builder builder) {
+    public void apply(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
         for (ModelConvention convention : conventions) {
-            convention.apply(builder);
+            convention.apply(builder, codecFinder);
         }
     }
 }

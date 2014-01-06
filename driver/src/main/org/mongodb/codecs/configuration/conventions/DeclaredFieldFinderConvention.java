@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package org.mongodb.codecs.models.conventions;
+package org.mongodb.codecs.configuration.conventions;
 
-import org.mongodb.codecs.models.ClassModel;
-import org.mongodb.codecs.models.FieldModel;
+import org.mongodb.codecs.FieldModel;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -25,8 +27,9 @@ import java.lang.reflect.Modifier;
 public class DeclaredFieldFinderConvention extends VisitingModelConvention {
 
     @Override
-    protected void visitClass(final ClassModel.Builder builder) {
-        Class theClass = builder.getModelClass();
+    @SuppressWarnings("unchecked")
+    protected void visitClass(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+        Class<?> theClass = builder.getModelClass();
         for (final Field field : theClass.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers())) {
                 // user has indicated not to serialize this field
@@ -47,9 +50,9 @@ public class DeclaredFieldFinderConvention extends VisitingModelConvention {
                 continue;
             }
 
-            // TODO: what else should we ignore?  transient?
+            // TODO: what else should we ignore?  final?
 
-            builder.addField(new FieldModel.Builder(field));
+            builder.addField(new FieldModelBuilder(field));
         }
     }
 }

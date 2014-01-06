@@ -1,9 +1,14 @@
-package org.mongodb.codecs.models;
+package org.mongodb.codecs.configuration;
 
 public class ModelBuilderValue<T> {
 
     private int level;
     private T value;
+
+    public ModelBuilderValue() {
+        level = Level.UNSET;
+        value = null;
+    }
 
     public ModelBuilderValue(final T value, final int level) {
         this.value = value;

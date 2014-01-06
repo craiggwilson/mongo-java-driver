@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.mongodb.codecs.models.conventions;
+package org.mongodb.codecs.configuration.conventions;
 
-import org.mongodb.codecs.models.ClassModel;
+import org.mongodb.codecs.configuration.ClassModelBuilder;
+import org.mongodb.codecs.configuration.CodecFinder;
 
 public interface ModelConvention {
 
-    void apply(ClassModel.Builder<?> builder);
+    void apply(ClassModelBuilder<?> builder, CodecFinder codecFinder);
 
 }
