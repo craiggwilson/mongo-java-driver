@@ -2,8 +2,8 @@ package org.mongodb.codecs.configuration;
 
 import org.mongodb.Codec;
 
-public interface CodecFinder {
+interface CodecFinder {
 
-    <T> Codec<T> find(Class<T> theClass);
+    <T> Codec<T> find(CodecSourceContext<T> context);
 
 }

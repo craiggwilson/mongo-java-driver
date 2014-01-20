@@ -18,7 +18,8 @@ package org.mongodb.codecs.configuration.conventions;
 
 import org.mongodb.codecs.FieldModel;
 import org.mongodb.codecs.configuration.ClassModelBuilder;
-import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.CodecSource;
+import org.mongodb.codecs.configuration.CodecSourceContext;
 import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ public class DeclaredFieldFinderConvention extends VisitingModelConvention {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void visitClass(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+    protected void visitClass(final ClassModelBuilder<?> builder, final CodecSourceContext<?> context) {
         Class<?> theClass = builder.getModelClass();
         for (final Field field : theClass.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers())) {

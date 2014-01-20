@@ -17,7 +17,7 @@
 package org.mongodb.codecs.configuration.conventions;
 
 import org.mongodb.codecs.configuration.ClassModelBuilder;
-import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.CodecSourceContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +35,9 @@ public class CompositeModelConvention implements ModelConvention {
     }
 
     @Override
-    public void apply(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+    public void apply(final ClassModelBuilder<?> builder, final CodecSourceContext<?> context) {
         for (ModelConvention convention : conventions) {
-            convention.apply(builder, codecFinder);
+            convention.apply(builder, context);
         }
     }
 }

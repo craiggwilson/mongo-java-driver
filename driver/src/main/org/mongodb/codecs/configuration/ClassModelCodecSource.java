@@ -14,16 +14,16 @@ public class ClassModelCodecSource implements CodecSource {
     private boolean includeAllClasses = false;
 
     @Override
-    public <T> Codec<T> getCodec(final Class<T> theClass, final CodecFinder finder) {
-        if (!includeAllClasses && !classes.contains(theClass)) {
+    public <T> Codec<T> getCodec(final CodecSourceContext<T> context) {
+        if (!includeAllClasses && !classes.contains(context.getCodecClass())) {
             // we aren't supposed to map this class.
             return null;
         }
 
-        ClassModelBuilder<T> builder = new ClassModelBuilder<T>(theClass);
+        ClassModelBuilder<T> builder = new ClassModelBuilder<T>(context.getCodecClass());
 
         for (ModelConvention convention : conventions) {
-            convention.apply(builder, finder);
+            convention.apply(builder, context);
         }
 
         ClassModel<T> model = builder.build();

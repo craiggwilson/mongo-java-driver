@@ -17,10 +17,10 @@
 package org.mongodb.codecs.configuration.conventions;
 
 import org.mongodb.codecs.configuration.ClassModelBuilder;
-import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.CodecSourceContext;
 
 public interface ModelConvention {
 
-    void apply(ClassModelBuilder<?> builder, CodecFinder codecFinder);
+    void apply(ClassModelBuilder<?> builder, CodecSourceContext<?> context);
 
 }

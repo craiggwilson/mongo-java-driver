@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class CodecRegistryBuilderTest {
 
-    private Codec<Person> personCodec;
+    private CodecRegistry subject;
 
     @Before
     public void before() {
@@ -32,11 +32,11 @@ public class CodecRegistryBuilderTest {
         classModelSource.include(Person.class);
         classModelSource.include(Name.class);
         classModelSource.include(Address.class);
+        classModelSource.include(CycleParent.class);
+        classModelSource.include(CycleChild.class);
         builder.addSource(classModelSource);
 
-        CodecRegistry registry = builder.build();
-
-        personCodec = registry.get(Person.class);
+        subject = builder.build();
     }
 
     @Test
@@ -45,7 +45,7 @@ public class CodecRegistryBuilderTest {
 
         StringWriter sw = new StringWriter();
         JSONWriter writer = new JSONWriter(sw);
-        personCodec.encode(writer, person);
+        subject.get(Person.class).encode(writer, person);
 
         String json = sw.toString();
 
@@ -61,10 +61,41 @@ public class CodecRegistryBuilderTest {
                       + " \"surname\" : \"Smith\" } }";
 
         JSONReader jr = new JSONReader(json);
-        Person person = personCodec.decode(jr);
+        Person person = subject.get(Person.class).decode(jr);
 
         Person expected = new Person(new Address(), new Name());
 
         assertEquals(expected, person);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testCycleDetection() {
+        CycleParent parent = new CycleParent();
+
+        subject.get(CycleParent.class);
+    }
+
+    private static class CycleParent {
+        private CycleChild child;
+
+        public CycleChild getChild() {
+            return child;
+        }
+
+        public void setChild(final CycleChild child) {
+            this.child = child;
+        }
+    }
+
+    private static class CycleChild {
+        private CycleParent parent;
+
+        public CycleParent getParent() {
+            return parent;
+        }
+
+        public void setParent(final CycleParent parent) {
+            this.parent = parent;
+        }
     }
 }

@@ -20,33 +20,34 @@ class CodecRegistryImpl implements CodecRegistry {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Codec<T> get(final Class<T> theClass) {
-        if (!codecs.containsKey(theClass)) {
-            codecs.putIfAbsent(theClass, getCodec(theClass));
-        }
-
-        return (Codec<T>) codecs.get(theClass);
-    }
-
-    private <T> Codec<T> getCodec(final Class<T> theClass) {
-
         CodecFinder finder = new CodecFinder() {
             @Override
-            public <T> Codec<T> find(final Class<T> theClass) {
-
-                // CodecFinder should have a context rather than just
-                // a class.  Having a context would allow us to track
-                // and satisfy cyclic codec references.
-                return get(theClass);
+            public <T> Codec<T> find(final CodecSourceContext<T> context) {
+                return get(context);
             }
         };
 
+        CodecSourceContext<T> context = new CodecSourceContext<T>(theClass, finder);
+        return get(context);
+    }
+
+    private <T> Codec<T> get(final CodecSourceContext<T> context) {
+        if (!codecs.containsKey(context.getCodecClass())) {
+            codecs.putIfAbsent(context.getCodecClass(), getCodec(context));
+        }
+
+        return (Codec<T>) codecs.get(context.getCodecClass());
+    }
+
+    private <T> Codec<T> getCodec(final CodecSourceContext<T> context) {
+
         for (CodecSource source : sources) {
-            Codec<T> result = source.getCodec(theClass, finder);
+            Codec<T> result = source.getCodec(context);
             if (result != null) {
                 return result;
             }
         }
 
-        throw new IllegalArgumentException(String.format("Can't find a codec for %s.", theClass));
+        throw new IllegalArgumentException(String.format("Can't find a codec for %s.", context.getCodecClass()));
     }
 }

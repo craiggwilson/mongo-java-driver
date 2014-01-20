@@ -3,7 +3,7 @@ package org.mongodb.codecs.configuration.conventions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mongodb.codecs.configuration.ClassModelBuilder;
-import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.CodecSourceContext;
 import org.mongodb.codecs.pojo.Name;
 
 import java.util.Arrays;
@@ -46,7 +46,7 @@ public class CompositeModelConventionTest {
         private int runIndex;
 
         @Override
-        public void apply(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+        public void apply(final ClassModelBuilder<?> builder, final CodecSourceContext<?> context) {
             wasRun = true;
             runIndex = counter++;
         }

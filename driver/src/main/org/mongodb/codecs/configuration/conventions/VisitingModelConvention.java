@@ -17,23 +17,23 @@
 package org.mongodb.codecs.configuration.conventions;
 
 import org.mongodb.codecs.configuration.ClassModelBuilder;
-import org.mongodb.codecs.configuration.CodecFinder;
+import org.mongodb.codecs.configuration.CodecSourceContext;
 import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 public abstract class VisitingModelConvention implements ModelConvention {
 
     @Override
-    public void apply(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
-        visitClass(builder, codecFinder);
+    public void apply(final ClassModelBuilder<?> builder, final CodecSourceContext<?> context) {
+        visitClass(builder, context);
     }
 
-    protected void visitClass(final ClassModelBuilder<?> builder, final CodecFinder codecFinder) {
+    protected void visitClass(final ClassModelBuilder<?> builder, final CodecSourceContext<?> context) {
         for (FieldModelBuilder field : builder.getFields()) {
-            visitField(field, codecFinder);
+            visitField(field, context);
         }
     }
 
-    protected void visitField(final FieldModelBuilder builder, final CodecFinder codecFinder) {
+    protected void visitField(final FieldModelBuilder builder, final CodecSourceContext<?> context) {
         // do nothing
     }
 }
