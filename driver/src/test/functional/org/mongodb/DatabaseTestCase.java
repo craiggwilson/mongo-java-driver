@@ -46,7 +46,7 @@ public class DatabaseTestCase {
         ClassModelCodecSource classModelSource = new ClassModelCodecSource();
         classModelSource.addConvention(new DeclaredFieldFinderConvention());
         classModelSource.addConvention(new CodecLookupConvention());
-        classModelSource.includeAllClasses();
+        classModelSource.mapAllClasses();
         builder.addSource(classModelSource);
 
         codecRegistry = builder.build();

@@ -22,7 +22,7 @@ public class FieldModelTest {
     @SuppressWarnings("unchecked")
     public void testNameIsTheValueSpecifiedInTheBuilder() throws NoSuchFieldException {
         FieldModelBuilder builder = new FieldModelBuilder(TestClass.class.getDeclaredField("one"));
-        builder.setName("somethingElse", Level.USER);
+        builder.name("somethingElse", Level.USER);
 
         FieldModel model = builder.build();
 
@@ -34,7 +34,7 @@ public class FieldModelTest {
     public void testCodecIsTheValueSpecifiedInTheBuilder() throws NoSuchFieldException {
         FieldModelBuilder builder = new FieldModelBuilder(TestClass.class.getDeclaredField("one"));
         StringCodec stringCodec = new StringCodec();
-        builder.setCodec((Codec) stringCodec, Level.USER);
+        builder.codec((Codec) stringCodec, Level.USER);
 
         FieldModel model = builder.build();
 

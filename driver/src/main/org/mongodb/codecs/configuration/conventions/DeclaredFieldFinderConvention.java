@@ -18,9 +18,7 @@ package org.mongodb.codecs.configuration.conventions;
 
 import org.mongodb.codecs.FieldModel;
 import org.mongodb.codecs.configuration.ClassModelBuilder;
-import org.mongodb.codecs.configuration.CodecSource;
 import org.mongodb.codecs.configuration.CodecSourceContext;
-import org.mongodb.codecs.configuration.FieldModelBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -53,7 +51,7 @@ public class DeclaredFieldFinderConvention extends VisitingModelConvention {
 
             // TODO: what else should we ignore?  final?
 
-            builder.addField(new FieldModelBuilder(field));
+            builder.map(field);
         }
     }
 }

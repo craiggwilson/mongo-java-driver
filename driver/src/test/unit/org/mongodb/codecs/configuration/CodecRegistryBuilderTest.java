@@ -29,11 +29,12 @@ public class CodecRegistryBuilderTest {
         ClassModelCodecSource classModelSource = new ClassModelCodecSource();
         classModelSource.addConvention(new DeclaredFieldFinderConvention());
         classModelSource.addConvention(new CodecLookupConvention());
-        classModelSource.include(Person.class);
-        classModelSource.include(Name.class);
-        classModelSource.include(Address.class);
-        classModelSource.include(CycleParent.class);
-        classModelSource.include(CycleChild.class);
+
+        classModelSource.map(Person.class);
+        classModelSource.map(Name.class);
+        classModelSource.map(Address.class);
+        classModelSource.map(CycleParent.class);
+        classModelSource.map(CycleChild.class);
         builder.addSource(classModelSource);
 
         subject = builder.build();
@@ -68,7 +69,7 @@ public class CodecRegistryBuilderTest {
         assertEquals(expected, person);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = CodecConfigurationException.class)
     public void testCycleDetection() {
         CycleParent parent = new CycleParent();
 

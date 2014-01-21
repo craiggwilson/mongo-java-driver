@@ -28,7 +28,7 @@ public abstract class VisitingModelConvention implements ModelConvention {
     }
 
     protected void visitClass(final ClassModelBuilder<?> builder, final CodecSourceContext<?> context) {
-        for (FieldModelBuilder field : builder.getFields()) {
+        for (FieldModelBuilder field : builder.getMappedFields()) {
             visitField(field, context);
         }
     }

@@ -6,24 +6,36 @@ import org.mongodb.codecs.ClassModelCodec;
 import org.mongodb.codecs.configuration.conventions.ModelConvention;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class ClassModelCodecSource implements CodecSource {
 
-    private final ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
+    private final LinkedHashMap<Class<?>, ClassModelBuilder<?>> classes = new LinkedHashMap<Class<?>, ClassModelBuilder<?>>();
     private final ArrayList<ModelConvention> conventions = new ArrayList<ModelConvention>();
-    private boolean includeAllClasses = false;
+    private boolean mapAllClasses = false;
 
     @Override
     public <T> Codec<T> getCodec(final CodecSourceContext<T> context) {
-        if (!includeAllClasses && !classes.contains(context.getCodecClass())) {
+
+        Class<T> theClass = context.getCodecClass();
+
+        if (!mapAllClasses && !classes.containsKey(theClass)) {
             // we aren't supposed to map this class.
             return null;
         }
 
-        ClassModelBuilder<T> builder = new ClassModelBuilder<T>(context.getCodecClass());
+        ClassModelBuilder<T> builder;
+        if (classes.containsKey(theClass)) {
+            builder = (ClassModelBuilder<T>) classes.get(theClass);
+        }
+        else {
+            builder = new ClassModelBuilder<T>(theClass);
+        }
 
-        for (ModelConvention convention : conventions) {
-            convention.apply(builder, context);
+        if (!builder.getSkipConventions()) {
+            for (ModelConvention convention : conventions) {
+                convention.apply(builder, context);
+            }
         }
 
         ClassModel<T> model = builder.build();
@@ -31,20 +43,30 @@ public class ClassModelCodecSource implements CodecSource {
         return new ClassModelCodec<T>(model);
     }
 
+    public <T> ClassModelBuilder<T> addBuilder(final ClassModelBuilder<T> builder) {
+        classes.put(builder.getModelClass(), builder);
+        return builder;
+    }
+
     public ClassModelCodecSource addConvention(final ModelConvention convention) {
         conventions.add(convention);
         return this;
     }
 
-    public <T> ClassModelCodecSource include(final Class<T> theClass) {
-        classes.add(theClass);
+    // TODO: I don't think this should be here, but to preserve existing functionality
+    // TODO: in PojoCodec, this exists to allow for wildcard mapping of classes
+    public <T> ClassModelCodecSource mapAllClasses() {
+        mapAllClasses = true;
         return this;
     }
 
-    // TODO: I don't think this should be here, but to preserve existing functionality
-    // TODO: in PojoCodec, this exists to allow for wildcard mapping of classes
-    public <T> ClassModelCodecSource includeAllClasses() {
-        includeAllClasses = true;
-        return this;
+    public <T> ClassModelBuilder<T> map(final Class<T> theClass) {
+        if (classes.containsKey(theClass)) {
+            return (ClassModelBuilder<T>) classes.get(theClass);
+        }
+
+        ClassModelBuilder<T> builder = new ClassModelBuilder<T>(theClass);
+        classes.put(theClass, builder);
+        return builder;
     }
 }

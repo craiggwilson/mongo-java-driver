@@ -24,7 +24,7 @@ public class DeclaredFieldFinderConventionTest {
     public void testFindsAllDeclaredNonStaticNonTransientFields() {
         subject.apply(builder, null);
 
-        Collection<FieldModelBuilder> fields = builder.getFields();
+        Collection<FieldModelBuilder> fields = builder.getMappedFields();
 
         assertEquals(2, fields.size());
     }

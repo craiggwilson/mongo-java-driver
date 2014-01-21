@@ -48,6 +48,6 @@ class CodecRegistryImpl implements CodecRegistry {
             }
         }
 
-        throw new IllegalArgumentException(String.format("Can't find a codec for %s.", context.getCodecClass()));
+        throw new CodecConfigurationException(String.format("Can't find a codec for %s.", context.getCodecClass()));
     }
 }

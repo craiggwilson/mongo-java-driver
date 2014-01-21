@@ -11,6 +11,6 @@ public class CodecLookupConvention extends VisitingModelConvention {
     @Override
     @SuppressWarnings("unchecked")
     protected void visitField(final FieldModelBuilder builder, final CodecSourceContext<?> context) {
-        builder.setCodec((Codec<Object>) context.findCodec(builder.getField().getType()), Level.CONVENTIONS);
+        builder.codec((Codec<Object>) context.findCodec(builder.getField().getType()), Level.CONVENTIONS);
     }
 }

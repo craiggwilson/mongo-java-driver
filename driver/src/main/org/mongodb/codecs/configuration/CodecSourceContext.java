@@ -22,7 +22,7 @@ public class CodecSourceContext<T> {
 
     public <U> Codec<U> findCodec(final Class<U> theClass) {
         if (hasCycles(theClass)) {
-            throw new RuntimeException("Need a better exception.  Cycles exist in the class structure.");
+            throw new CodecConfigurationException("Cycles exist in the class structure.");
         }
 
         CodecSourceContext<U> context = new CodecSourceContext<U>(this, theClass);

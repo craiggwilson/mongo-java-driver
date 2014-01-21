@@ -36,7 +36,7 @@ public class ClassModel<T> {
     public ClassModel(final ClassModelBuilder<T> builder) {
         this.theClass = builder.getModelClass();
 
-        for (final FieldModelBuilder fieldModelBuilder : builder.getFields()) {
+        for (final FieldModelBuilder fieldModelBuilder : builder.getMappedFields()) {
             FieldModel fieldModel = fieldModelBuilder.build();
             validatedFields.add(fieldModel);
             validatedFieldsByName.put(fieldModel.getName(), fieldModel);
