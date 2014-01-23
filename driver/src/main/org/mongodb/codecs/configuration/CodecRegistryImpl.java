@@ -31,6 +31,7 @@ class CodecRegistryImpl implements CodecRegistry {
         return get(context);
     }
 
+    @SuppressWarnings("unchecked")
     private <T> Codec<T> get(final CodecSourceContext<T> context) {
         if (!codecs.containsKey(context.getCodecClass())) {
             codecs.putIfAbsent(context.getCodecClass(), getCodec(context));
