@@ -6,22 +6,26 @@ import org.mongodb.codecs.FieldModel;
 import java.lang.reflect.Field;
 
 public class FieldModelBuilder {
+    private ModelBuilderValue<String> alias;
     private ModelBuilderValue<Codec<Object>> codec;
     private Field field;
     private ModelBuilderValue<Object> defaultValue;
-    private ModelBuilderValue<Boolean> ignoreIfDefault;
-    private ModelBuilderValue<String> name;
+    private ModelBuilderValue<Boolean> persistDefaultValue;
 
     public FieldModelBuilder(final Field field) {
         this.field = field;
+        alias = new ModelBuilderValue<String>(field.getName(), Level.DEFAULT);
         codec = new ModelBuilderValue<Codec<Object>>(); // can't have a default codec...
         defaultValue = new ModelBuilderValue<Object>(null, Level.DEFAULT);
-        ignoreIfDefault = new ModelBuilderValue<Boolean>(false, Level.DEFAULT);
-        name = new ModelBuilderValue<String>(field.getName(), Level.DEFAULT);
+        persistDefaultValue = new ModelBuilderValue<Boolean>(true, Level.DEFAULT);
     }
 
     public FieldModel build() {
         return new FieldModel(this);
+    }
+
+    public ModelBuilderValue<String> getAlias() {
+        return alias;
     }
 
     public ModelBuilderValue<Codec<Object>> getCodec() {
@@ -36,12 +40,17 @@ public class FieldModelBuilder {
         return field;
     }
 
-    public ModelBuilderValue<Boolean> getIgnoreIfDefault() {
-        return ignoreIfDefault;
+    public ModelBuilderValue<Boolean> getPersistDefaultValue() {
+        return persistDefaultValue;
     }
 
-    public ModelBuilderValue<String> getName() {
-        return name;
+    public FieldModelBuilder alias(final String name) {
+        return alias(name, Level.USER);
+    }
+
+    public FieldModelBuilder alias(final String name, final int level) {
+        alias.set(name, level);
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -64,25 +73,12 @@ public class FieldModelBuilder {
         return this;
     }
 
-    public FieldModelBuilder ignoreIfDefault() {
-        return ignoreIfDefault(true);
+    public FieldModelBuilder persistDefaultValue(final boolean value) {
+        return persistDefaultValue(value, Level.USER);
     }
 
-    public FieldModelBuilder ignoreIfDefault(final boolean value) {
-        return ignoreIfDefault(value, Level.USER);
-    }
-
-    public FieldModelBuilder ignoreIfDefault(final boolean value, final int level) {
-        this.ignoreIfDefault.set(value, Level.USER);
-        return this;
-    }
-
-    public FieldModelBuilder name(final String name) {
-        return this.name(name, Level.USER);
-    }
-
-    public FieldModelBuilder name(final String name, final int level) {
-        this.name.set(name, level);
+    public FieldModelBuilder persistDefaultValue(final boolean value, final int level) {
+        this.persistDefaultValue.set(value, Level.USER);
         return this;
     }
 }

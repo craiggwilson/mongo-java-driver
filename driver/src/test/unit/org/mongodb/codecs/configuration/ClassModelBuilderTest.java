@@ -29,8 +29,8 @@ public class ClassModelBuilderTest {
             super(Person.class);
 
             setSkipConventions(true);
-            map("address").name("a").defaultValue(null).ignoreIfDefault();
-            map("name").name("n");
+            map("address").alias("a").defaultValue(null).persistDefaultValue(false);
+            map("name").alias("n");
         }
     }
 }

@@ -2,8 +2,6 @@ package org.mongodb.codecs;
 
 import org.junit.Test;
 import org.mongodb.Codec;
-import org.mongodb.codecs.FieldModel;
-import org.mongodb.codecs.StringCodec;
 import org.mongodb.codecs.configuration.FieldModelBuilder;
 import org.mongodb.codecs.configuration.Level;
 
@@ -18,13 +16,15 @@ public class FieldModelTest {
 
         assertEquals("one", model.getName());
         assertNull(model.getCodec());
+        assertEquals(true, model.getPersistDefaultValue());
+        assertEquals(null, model.getDefaultValue());
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void testNameIsTheValueSpecifiedInTheBuilder() throws NoSuchFieldException {
         FieldModelBuilder builder = new FieldModelBuilder(TestClass.class.getDeclaredField("one"));
-        builder.name("somethingElse", Level.USER);
+        builder.alias("somethingElse");
 
         FieldModel model = builder.build();
 
@@ -36,11 +36,31 @@ public class FieldModelTest {
     public void testCodecIsTheValueSpecifiedInTheBuilder() throws NoSuchFieldException {
         FieldModelBuilder builder = new FieldModelBuilder(TestClass.class.getDeclaredField("one"));
         StringCodec stringCodec = new StringCodec();
-        builder.codec((Codec) stringCodec, Level.USER);
+        builder.codec((Codec) stringCodec);
 
         FieldModel model = builder.build();
 
         assertSame(stringCodec, model.getCodec());
+    }
+
+    @Test
+    public void testDefaultValueIsTheValueSpecifiedInTheBuilder() throws NoSuchFieldException {
+        FieldModelBuilder builder = new FieldModelBuilder(TestClass.class.getDeclaredField("one"));
+        builder.defaultValue("two");
+
+        FieldModel model = builder.build();
+
+        assertSame("two", model.getDefaultValue());
+    }
+
+    @Test
+    public void testPersistDefaultValueIsTheValueSpecifiedInTheBuilder() throws NoSuchFieldException {
+        FieldModelBuilder builder = new FieldModelBuilder(TestClass.class.getDeclaredField("one"));
+        builder.persistDefaultValue(false);
+
+        FieldModel model = builder.build();
+
+        assertSame(false, model.getPersistDefaultValue());
     }
 
     private class TestClass {

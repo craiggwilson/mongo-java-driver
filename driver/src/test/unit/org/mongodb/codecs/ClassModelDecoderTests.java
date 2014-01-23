@@ -43,8 +43,8 @@ public class ClassModelDecoderTests {
     @Test
     public void shouldDecodeFullClass() throws IOException {
         ClassModelBuilder<Address> builder = new ClassModelBuilder<Address>(Address.class);
-        builder.map("address1").name("a1").codec(new StringCodec());
-        builder.map("address2").name("a2").codec(new StringCodec());
+        builder.map("address1").alias("a1").codec(new StringCodec());
+        builder.map("address2").alias("a2").codec(new StringCodec());
 
         Document expected = new Document();
         expected.append("a1", "first");

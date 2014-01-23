@@ -44,13 +44,13 @@ public class ClassModelEncoder<T> implements Encoder<T> {
     }
 
     private boolean shouldEncodeField(final FieldModel fieldModel, final Object fieldValue) {
-        if (!fieldModel.getIgnoreIfDefault()) {
+        if (fieldModel.getPersistDefaultValue()) {
             return true;
         }
 
         Object defaultValue = fieldModel.getDefaultValue();
-        if (defaultValue == null && fieldValue == null) {
-            return false;
+        if (defaultValue == null) {
+            return fieldValue != null;
         }
 
         if (defaultValue.equals(fieldValue)) {

@@ -2,20 +2,16 @@ package org.mongodb.codecs;
 
 import org.bson.BSONBinaryReader;
 import org.bson.BSONBinaryWriter;
-import org.bson.BSONBinaryWriterSettings;
 import org.bson.BSONReaderSettings;
 import org.bson.BSONWriter;
-import org.bson.BSONWriterSettings;
 import org.bson.ByteBufNIO;
 import org.bson.io.BasicInputBuffer;
 import org.bson.io.BasicOutputBuffer;
 import org.bson.io.InputBuffer;
-import org.bson.io.OutputBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mongodb.Codec;
-import org.mongodb.CodecRegistry;
 import org.mongodb.Document;
 import org.mongodb.codecs.configuration.ClassModelBuilder;
 import org.mongodb.codecs.pojo.Address;
@@ -47,8 +43,8 @@ public class ClassModelEncoderTests {
     @Test
     public void shouldEncodeFullClass() throws IOException {
         ClassModelBuilder<Address> builder = new ClassModelBuilder<Address>(Address.class);
-        builder.map("address1").name("a1").codec(new StringCodec());
-        builder.map("address2").name("a2").codec(new StringCodec());
+        builder.map("address1").alias("a1").codec(new StringCodec());
+        builder.map("address2").alias("a2").codec(new StringCodec());
 
         Address value = new Address();
 
@@ -64,8 +60,8 @@ public class ClassModelEncoderTests {
     @Test
     public void shouldSkipFieldsSetToIgnoreDefaultValues() throws IOException {
         ClassModelBuilder<Address> builder = new ClassModelBuilder<Address>(Address.class);
-        builder.map("address1").name("a1").codec(new StringCodec()).defaultValue("Flat 1").ignoreIfDefault();
-        builder.map("address2").name("a2").codec(new StringCodec());
+        builder.map("address1").alias("a1").codec(new StringCodec()).defaultValue("Flat 1").persistDefaultValue(false);
+        builder.map("address2").alias("a2").codec(new StringCodec());
 
         Address value = new Address();
 

@@ -28,20 +28,20 @@ public class FieldModel {
     private final Codec<Object> codec;
     private final Object defaultValue;
     private final Field field;
-    private final Boolean ignoreIfDefault;
     private final String name;
+    private final Boolean persistDefaultValue;
 
     // TODO: don't reference FieldModelBuilder here
     public FieldModel(final FieldModelBuilder builder) {
-        if (!isValidFieldName(builder.getName().get())) {
-            throw new IllegalArgumentException(String.format("%s is not a valid mongodb field name.", builder.getName()));
+        if (!isValidFieldName(builder.getAlias().get())) {
+            throw new IllegalArgumentException(String.format("%s is not a valid mongodb field name.", builder.getAlias()));
         }
 
         codec = builder.getCodec().get();
         defaultValue = builder.getDefaultValue().get();
         field = builder.getField();
-        ignoreIfDefault = builder.getIgnoreIfDefault().get();
-        name = builder.getName().get();
+        name = builder.getAlias().get();
+        persistDefaultValue = builder.getPersistDefaultValue().get();
     }
 
     public Object getValue(final Object target) throws IllegalAccessException {
@@ -59,8 +59,8 @@ public class FieldModel {
 
     public Field getField() { return field; }
 
-    public Boolean getIgnoreIfDefault() {
-        return ignoreIfDefault;
+    public Boolean getPersistDefaultValue() {
+        return persistDefaultValue;
     }
 
     public String getName() {
