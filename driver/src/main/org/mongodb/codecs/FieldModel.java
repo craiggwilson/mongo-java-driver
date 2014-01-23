@@ -26,7 +26,9 @@ public class FieldModel {
     private static final Pattern FIELD_NAME_REGEX_PATTERN = Pattern.compile("([a-zA-Z_][\\w$]*)");
 
     private final Codec<Object> codec;
+    private final Object defaultValue;
     private final Field field;
+    private final Boolean ignoreIfDefault;
     private final String name;
 
     // TODO: don't reference FieldModelBuilder here
@@ -36,7 +38,9 @@ public class FieldModel {
         }
 
         codec = builder.getCodec().get();
+        defaultValue = builder.getDefaultValue().get();
         field = builder.getField();
+        ignoreIfDefault = builder.getIgnoreIfDefault().get();
         name = builder.getName().get();
     }
 
@@ -49,7 +53,15 @@ public class FieldModel {
 
     public Codec<Object> getCodec() { return codec; }
 
+    public Object getDefaultValue() {
+        return defaultValue;
+    }
+
     public Field getField() { return field; }
+
+    public Boolean getIgnoreIfDefault() {
+        return ignoreIfDefault;
+    }
 
     public String getName() {
         return name;

@@ -1,9 +1,11 @@
-package org.mongodb.codecs.configuration;
+package org.mongodb.codecs;
 
 import org.junit.Test;
 import org.mongodb.Codec;
 import org.mongodb.codecs.FieldModel;
 import org.mongodb.codecs.StringCodec;
+import org.mongodb.codecs.configuration.FieldModelBuilder;
+import org.mongodb.codecs.configuration.Level;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

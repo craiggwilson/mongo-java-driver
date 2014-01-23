@@ -12,7 +12,7 @@ public class FieldModelBuilder {
     private ModelBuilderValue<Boolean> ignoreIfDefault;
     private ModelBuilderValue<String> name;
 
-    FieldModelBuilder(final Field field) {
+    public FieldModelBuilder(final Field field) {
         this.field = field;
         codec = new ModelBuilderValue<Codec<Object>>(); // can't have a default codec...
         defaultValue = new ModelBuilderValue<Object>(null, Level.DEFAULT);
@@ -28,19 +28,29 @@ public class FieldModelBuilder {
         return codec;
     }
 
+    public ModelBuilderValue<Object> getDefaultValue() {
+        return defaultValue;
+    }
+
     public Field getField() {
         return field;
+    }
+
+    public ModelBuilderValue<Boolean> getIgnoreIfDefault() {
+        return ignoreIfDefault;
     }
 
     public ModelBuilderValue<String> getName() {
         return name;
     }
 
-    public FieldModelBuilder codec(final Codec<Object> codec) {
+    @SuppressWarnings("unchecked")
+    public FieldModelBuilder codec(final Codec codec) {
         return codec(codec, Level.USER);
     }
 
-    public FieldModelBuilder codec(final Codec<Object> codec, final int level) {
+    @SuppressWarnings("unchecked")
+    public FieldModelBuilder codec(final Codec codec, final int level) {
         this.codec.set(codec, level);
         return this;
     }
