@@ -17,8 +17,8 @@
 package org.mongodb.codecs.pojo;
 
 public class Address {
-    private final String address1 = "Flat 1";
-    private final String address2 = "Town";
+    private String address1 = "Flat 1";
+    private String address2 = "Town";
 
     public String getAddress1() {
         return address1;
