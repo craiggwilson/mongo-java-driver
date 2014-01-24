@@ -33,8 +33,7 @@ public class CodecRegistryBuilderTest {
         classModelSource.map(Person.class);
         classModelSource.map(Name.class);
         classModelSource.map(Address.class);
-        classModelSource.map(CycleParent.class);
-        classModelSource.map(CycleChild.class);
+        classModelSource.map(CyclePerson.class);
         builder.addSource(classModelSource);
 
         subject = builder.build();
@@ -69,34 +68,45 @@ public class CodecRegistryBuilderTest {
         assertEquals(expected, person);
     }
 
-    @Test(expected = CodecConfigurationException.class)
-    public void testCycleDetection() {
-        CycleParent parent = new CycleParent();
+    @Test
+    public void testClassesWithCycles() {
+        CyclePerson parent = new CyclePerson();
+        parent.setName("parent");
 
-        subject.get(CycleParent.class);
+        CyclePerson child = new CyclePerson();
+        child.setName("child");
+
+        parent.setChild(child);
+
+        StringWriter sw = new StringWriter();
+        JSONWriter writer = new JSONWriter(sw);
+        subject.get(CyclePerson.class).encode(writer, parent);
+
+        String json = sw.toString();
+
+        String expected = "{ \"child\" : { \"child\" : null, \"name\" : \"child\" }, \"name\" : \"parent\" }";
+
+        assertEquals(expected, json);
     }
 
-    private static class CycleParent {
-        private CycleChild child;
+    private static class CyclePerson {
+        private CyclePerson child;
+        private String name;
 
-        public CycleChild getChild() {
+        public CyclePerson getChild() {
             return child;
         }
 
-        public void setChild(final CycleChild child) {
+        public String getName() {
+            return name;
+        }
+
+        public void setChild(final CyclePerson child) {
             this.child = child;
         }
-    }
 
-    private static class CycleChild {
-        private CycleParent parent;
-
-        public CycleParent getParent() {
-            return parent;
-        }
-
-        public void setParent(final CycleParent parent) {
-            this.parent = parent;
+        public void setName(final String name) {
+            this.name = name;
         }
     }
 }

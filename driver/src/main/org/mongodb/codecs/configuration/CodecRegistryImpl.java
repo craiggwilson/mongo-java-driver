@@ -27,7 +27,7 @@ class CodecRegistryImpl implements CodecRegistry {
             }
         };
 
-        CodecSourceContext<T> context = new CodecSourceContext<T>(theClass, finder);
+        CodecSourceContext<T> context = new CodecSourceContext<T>(this, theClass, finder);
         return get(context);
     }
 

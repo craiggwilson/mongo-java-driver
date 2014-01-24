@@ -13,6 +13,11 @@ public class ClassModelEncoder<T> implements Encoder<T> {
 
     @Override
     public void encode(final BSONWriter bsonWriter, final T value) {
+        if (value == null) {
+            bsonWriter.writeNull();
+            return;
+        }
+
         bsonWriter.writeStartDocument();
         encodePojo(bsonWriter, value);
         bsonWriter.writeEndDocument();
