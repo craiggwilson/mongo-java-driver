@@ -8,6 +8,7 @@ import org.mongodb.codecs.configuration.conventions.ModelConvention;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+@SuppressWarnings("unchecked")
 public class ClassModelCodecSource implements CodecSource {
 
     private final LinkedHashMap<Class<?>, ClassModelBuilder<?>> classes = new LinkedHashMap<Class<?>, ClassModelBuilder<?>>();

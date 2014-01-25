@@ -51,6 +51,10 @@ public class CodecSourceContext<T> {
         return parent;
     }
 
+    public CodecRegistry getRegistry() {
+        return registry;
+    }
+
     private <U> Boolean hasCycles(final Class<U> theClass) {
         CodecSourceContext<?> current = this;
         while (current != null) {
