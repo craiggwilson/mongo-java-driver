@@ -53,7 +53,7 @@ class CodecRegistryImpl implements CodecRegistry, CodecSource {
                 return result;
             }
         }
-        
+
         return null;
     }
 }
