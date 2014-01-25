@@ -24,7 +24,6 @@ public class CodecRegistryBuilderTest {
     @Before
     public void before() {
         CodecRegistryBuilder builder = new CodecRegistryBuilder();
-        builder.addSource(new PrimitiveCodecSource());
 
         ClassModelCodecSource classModelSource = new ClassModelCodecSource();
         classModelSource.addConvention(new DeclaredFieldFinderConvention());
@@ -35,6 +34,8 @@ public class CodecRegistryBuilderTest {
         classModelSource.map(Address.class);
         classModelSource.map(CyclePerson.class);
         builder.addSource(classModelSource);
+
+        builder.addSource(new PrimitiveCodecSource());
 
         subject = builder.build();
     }

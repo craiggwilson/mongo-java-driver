@@ -48,7 +48,7 @@ public class PrimitiveCodecSource implements CodecSource {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Codec<T> getCodec(final CodecSourceContext<T> context) {
+    public <T> Codec<T> get(final CodecSourceContext<T> context) {
         if (codecs.containsKey(context.getCodecClass())) {
             return (Codec<T>) codecs.get(context.getCodecClass());
         }

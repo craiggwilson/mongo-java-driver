@@ -15,7 +15,7 @@ public class ClassModelCodecSource implements CodecSource {
     private boolean mapAllClasses = false;
 
     @Override
-    public <T> Codec<T> getCodec(final CodecSourceContext<T> context) {
+    public <T> Codec<T> get(final CodecSourceContext<T> context) {
 
         Class<T> theClass = context.getCodecClass();
 
