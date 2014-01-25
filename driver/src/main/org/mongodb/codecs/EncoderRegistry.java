@@ -38,7 +38,7 @@ public class EncoderRegistry {
 
     public EncoderRegistry() {
         codecs = new Codecs(primitiveCodecs, defaultValidator, this);
-        classToEncoderMap.put(CodeWithScope.class, new CodeWithScopeCodec(codecs));
+        classToEncoderMap.put(CodeWithScope.class, new CodeWithScopeCodec(new SimpleDocumentCodec(codecs)));
         classToEncoderMap.put(Iterable.class, new IterableCodec(codecs));
         classToEncoderMap.put(DBRef.class, new DBRefEncoder(codecs));
     }

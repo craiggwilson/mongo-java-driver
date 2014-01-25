@@ -54,8 +54,8 @@ public class Codecs implements Codec<Object> {
         iterableCodec = new IterableCodec(this);
         mapCodec = new MapCodec(this, fieldNameValidator);
         dbRefEncoder = new DBRefEncoder(this);
-        codeWithScopeCodec = new CodeWithScopeCodec(this);
         simpleDocumentCodec = new SimpleDocumentCodec(this);
+        codeWithScopeCodec = new CodeWithScopeCodec(simpleDocumentCodec);
     }
 
     public static Codecs createDefault() {
