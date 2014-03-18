@@ -25,6 +25,7 @@ import org.mongodb.MongoNamespace;
 import org.mongodb.ReadPreference;
 import org.mongodb.codecs.DocumentCodec;
 import org.mongodb.codecs.PrimitiveCodecs;
+import org.mongodb.codecs.configuration.CodecRegistryBuilder;
 import org.mongodb.connection.BufferProvider;
 import org.mongodb.protocol.CommandProtocol;
 import org.mongodb.session.ServerConnectionProvider;
@@ -72,7 +73,7 @@ public class MapReduceWithInlineResultsOperation<T> extends BaseOperation<MapRed
         }
         this.namespace = notNull("namespace", namespace);
         this.readPreference = readPreference;
-        this.mapReduceResultDecoder = new MapReduceCommandResultCodec<T>(PrimitiveCodecs.createDefault(), decoder);
+        this.mapReduceResultDecoder = new MapReduceCommandResultCodec<T>(CodecRegistryBuilder.getDefault(), decoder);
         this.command = createMapReduce(namespace.getCollectionName(), mapReduce);
     }
 

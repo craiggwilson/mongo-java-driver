@@ -16,6 +16,7 @@
 
 package org.mongodb.protocol;
 
+import org.bson.BSONWriter;
 import org.mongodb.CommandResult;
 import org.mongodb.Document;
 import org.mongodb.Encoder;
@@ -27,6 +28,7 @@ import org.mongodb.WriteResult;
 import org.mongodb.codecs.DocumentCodec;
 import org.mongodb.codecs.EncoderRegistry;
 import org.mongodb.codecs.PrimitiveCodecs;
+import org.mongodb.codecs.configuration.CodecRegistryBuilder;
 import org.mongodb.codecs.validators.QueryFieldNameValidator;
 import org.mongodb.connection.BufferProvider;
 import org.mongodb.connection.Connection;
@@ -167,14 +169,20 @@ public abstract class WriteCommandProtocol implements Protocol<WriteResult> {
     protected abstract Logger getLogger();
 
     protected static class CommandCodec<T> extends DocumentCodec {
+        private final Encoder<T> encoder;
+
         public CommandCodec(final Encoder<T> encoder) {
-            super(PrimitiveCodecs.createDefault(), new QueryFieldNameValidator(), createEncoderRegistry(encoder));
+            this.encoder = encoder;
         }
 
-        private static <T> EncoderRegistry createEncoderRegistry(final Encoder<T> encoder) {
-            EncoderRegistry encoderRegistry = new EncoderRegistry();
-            encoderRegistry.register(encoder.getEncoderClass(), encoder);
-            return encoderRegistry;
+        @Override
+        protected void writeValue(final BSONWriter bsonWriter, final Object value) {
+            if (value != null && value.getClass().equals(encoder.getEncoderClass())) {
+                encoder.encode(bsonWriter, (T) value);
+            }
+            else {
+                super.writeValue(bsonWriter, value);
+            }
         }
     }
 }

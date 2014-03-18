@@ -19,41 +19,45 @@ package org.mongodb.codecs;
 import org.bson.BSONReader;
 import org.bson.BSONType;
 import org.bson.BSONWriter;
+import org.bson.types.BSONTimestamp;
+import org.bson.types.Code;
+import org.bson.types.CodeWithScope;
+import org.bson.types.MaxKey;
+import org.bson.types.MinKey;
+import org.bson.types.ObjectId;
 import org.mongodb.Codec;
+import org.mongodb.CodecRegistry;
+import org.mongodb.Decoder;
 import org.mongodb.Document;
+import org.mongodb.codecs.configuration.CodecRegistryBuilder;
 import org.mongodb.codecs.validators.QueryFieldNameValidator;
 import org.mongodb.codecs.validators.Validator;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import static java.lang.String.format;
 
 // TODO: decode into DBRef?
 public class DocumentCodec implements Codec<Document> {
     private final Validator<String> fieldNameValidator;
-    private final Codecs codecs;
+    private final CodecRegistry codecRegistry;
 
     public DocumentCodec() {
-        this(PrimitiveCodecs.createDefault());
+        this(CodecRegistryBuilder.getDefault());
     }
 
-    public DocumentCodec(final PrimitiveCodecs primitiveCodecs) {
-        this(primitiveCodecs, new QueryFieldNameValidator());
+    public DocumentCodec(final CodecRegistry codecRegistry) {
+        this(codecRegistry, new QueryFieldNameValidator());
     }
 
-    protected DocumentCodec(final PrimitiveCodecs primitiveCodecs, final Validator<String> fieldNameValidator) {
-        this(fieldNameValidator, new Codecs(primitiveCodecs, fieldNameValidator, new EncoderRegistry()));
-    }
-
-    protected DocumentCodec(final PrimitiveCodecs primitiveCodecs, final Validator<String> fieldNameValidator,
-                            final EncoderRegistry encoderRegistry) {
-        this(fieldNameValidator, new Codecs(primitiveCodecs, fieldNameValidator, encoderRegistry));
-    }
-
-    protected DocumentCodec(final Validator<String> fieldNameValidator, final Codecs codecs) {
-        if (codecs == null) {
-            throw new IllegalArgumentException("codecs is null");
+    protected DocumentCodec(final CodecRegistry codecRegistry, final Validator<String> fieldNameValidator) {
+        if (codecRegistry == null) {
+            throw new IllegalArgumentException("codecRegistry is null");
         }
+        this.codecRegistry = codecRegistry;
         this.fieldNameValidator = fieldNameValidator;
-        this.codecs = codecs;
     }
 
     @Override
@@ -81,9 +85,14 @@ public class DocumentCodec implements Codec<Document> {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void writeValue(final BSONWriter bsonWriter, final Object value) {
-        codecs.encode(bsonWriter, value);
+        if (value == null) {
+            bsonWriter.writeNull();
+        }
+
+        Codec codec = codecRegistry.get(value.getClass());
+        codec.encode(bsonWriter, value);
     }
 
     @Override
@@ -100,13 +109,48 @@ public class DocumentCodec implements Codec<Document> {
 
         return document;
     }
-
+    
     protected Object readValue(final BSONReader reader, final String fieldName) {
         BSONType bsonType = reader.getCurrentBSONType();
         if (bsonType.equals(BSONType.DOCUMENT)) {
             return this.decode(reader);
         } else {
-            return codecs.decode(reader);
+            return getCodecFromBSONType(bsonType).decode(reader);
+        }
+    }
+
+    protected Decoder getCodecFromBSONType(final BSONType bsonType) {
+        switch (bsonType) {
+            case DOUBLE:
+                return codecRegistry.get(Double.class);
+            case STRING:
+                return codecRegistry.get(String.class);
+            case DOCUMENT:
+                return this;
+            case OBJECT_ID:
+                return codecRegistry.get(ObjectId.class);
+            case BOOLEAN:
+                return codecRegistry.get(Boolean.class);
+            case DATE_TIME:
+                return codecRegistry.get(Date.class);
+            case REGULAR_EXPRESSION:
+                return codecRegistry.get(Pattern.class);
+            case JAVASCRIPT:
+                return codecRegistry.get(Code.class);
+            case JAVASCRIPT_WITH_SCOPE:
+                return codecRegistry.get(CodeWithScope.class);
+            case INT32:
+                return codecRegistry.get(Integer.class);
+            case TIMESTAMP:
+                return codecRegistry.get(BSONTimestamp.class);
+            case INT64:
+                return codecRegistry.get(Long.class);
+            case MIN_KEY:
+                return codecRegistry.get(MinKey.class);
+            case MAX_KEY:
+                return codecRegistry.get(MaxKey.class);
+            default:
+                throw new UnsupportedOperationException(format("Cannot decode BSONType %s", bsonType));
         }
     }
 

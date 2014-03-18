@@ -17,6 +17,7 @@
 package org.mongodb.codecs;
 
 import org.bson.BSONWriter;
+import org.mongodb.CodecRegistry;
 import org.mongodb.CollectibleCodec;
 import org.mongodb.Document;
 import org.mongodb.IdGenerator;
@@ -29,9 +30,9 @@ public class CollectibleDocumentCodec extends DocumentCodec implements Collectib
     public static final String ID_FIELD_NAME = "_id";
     private final IdGenerator idGenerator;
 
-    public CollectibleDocumentCodec(final PrimitiveCodecs primitiveCodecs,
+    public CollectibleDocumentCodec(final CodecRegistry codecRegistry,
                                     final IdGenerator idGenerator) {
-        super(primitiveCodecs, new FieldNameValidator());
+        super(codecRegistry, new FieldNameValidator());
         if (idGenerator == null) {
             throw new IllegalArgumentException("idGenerator is null");
         }

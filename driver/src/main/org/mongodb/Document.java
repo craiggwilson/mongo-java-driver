@@ -97,7 +97,7 @@ public class Document implements Map<String, Object>, Serializable {
      */
     public static Document valueOf(final String s, final JSONMode mode) {
         BSONReader bsonReader = new JSONReader(new JSONReaderSettings(mode), s);
-        return new DocumentCodec(PrimitiveCodecs.createDefault()).decode(bsonReader);
+        return new DocumentCodec().decode(bsonReader);
     }
 
     /**
@@ -253,7 +253,7 @@ public class Document implements Map<String, Object>, Serializable {
         // i.e. anything that requires a custom codec, like POJOs or custom CollectibleCodecs for generic Collections
         StringWriter writer = new StringWriter();
         BSONWriter bsonWriter = new JSONWriter(writer, new JSONWriterSettings(JSONMode.STRICT));
-        Codec<Document> codec = new DocumentCodec(PrimitiveCodecs.createDefault());
+        Codec<Document> codec = new DocumentCodec();
         codec.encode(bsonWriter, this);
 
         return writer.toString();

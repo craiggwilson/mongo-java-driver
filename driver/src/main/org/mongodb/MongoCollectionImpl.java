@@ -65,7 +65,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         this.database = database;
         this.options = options;
         this.client = client;
-        admin = new CollectionAdministrationImpl(client, options.getPrimitiveCodecs(), getNamespace(), getDatabase());
+        admin = new CollectionAdministrationImpl(client, options.getCodecRegistry(), getNamespace(), getDatabase());
     }
 
     @Override

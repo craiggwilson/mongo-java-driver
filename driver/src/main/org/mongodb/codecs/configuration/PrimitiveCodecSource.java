@@ -1,11 +1,15 @@
 package org.mongodb.codecs.configuration;
 
+import org.bson.types.CodeWithScope;
 import org.mongodb.Codec;
+import org.mongodb.Document;
 import org.mongodb.codecs.BooleanCodec;
 import org.mongodb.codecs.ByteArrayCodec;
 import org.mongodb.codecs.ByteCodec;
 import org.mongodb.codecs.CodeCodec;
+import org.mongodb.codecs.CodeWithScopeCodec;
 import org.mongodb.codecs.DateCodec;
+import org.mongodb.codecs.DocumentCodec;
 import org.mongodb.codecs.DoubleCodec;
 import org.mongodb.codecs.FloatCodec;
 import org.mongodb.codecs.IntegerCodec;
@@ -51,6 +55,14 @@ public class PrimitiveCodecSource implements CodecSource {
     public <T> Codec<T> get(final CodecSourceContext<T> context) {
         if (codecs.containsKey(context.getCodecClass())) {
             return (Codec<T>) codecs.get(context.getCodecClass());
+        }
+
+        if (context.getCodecClass().equals(CodeWithScope.class)) {
+            return (Codec<T>) new CodeWithScopeCodec(context.findCodec(Document.class));
+        }
+
+        if (context.getCodecClass().equals(Document.class)) {
+            return (Codec<T>) new DocumentCodec(context.getRegistry());
         }
 
         return null;

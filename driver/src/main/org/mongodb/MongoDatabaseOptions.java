@@ -54,7 +54,7 @@ public class MongoDatabaseOptions {
         builder.writeConcern = getWriteConcern() != null ? getWriteConcern() : options.getWriteConcern();
         builder.readPreference = getReadPreference() != null ? getReadPreference() : options.getReadPreference();
         builder.documentCodec = getDocumentCodec() != null ? getDocumentCodec()
-                                                           : new DocumentCodec(builder.primitiveCodecs);
+                                                           : new DocumentCodec();
         return builder.build();
     }
 

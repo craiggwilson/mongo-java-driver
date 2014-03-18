@@ -46,12 +46,12 @@ class CollectionAdministrationImpl implements CollectionAdministration {
     private final Document collStatsCommand;
 
     CollectionAdministrationImpl(final MongoClientImpl client,
-                                 final PrimitiveCodecs primitiveCodecs,
+                                 final CodecRegistry codecRegistry,
                                  final MongoNamespace collectionNamespace,
                                  final MongoDatabase database) {
         this.client = client;
         this.database = database;
-        this.documentCodec = new DocumentCodec(primitiveCodecs);
+        this.documentCodec = new DocumentCodec(codecRegistry);
         indexesNamespace = new MongoNamespace(database.getName(), "system.indexes");
         this.collectionNamespace = collectionNamespace;
         collStatsCommand = new Document("collStats", collectionNamespace.getCollectionName());

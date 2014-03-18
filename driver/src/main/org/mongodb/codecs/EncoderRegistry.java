@@ -19,6 +19,7 @@ package org.mongodb.codecs;
 import org.bson.types.CodeWithScope;
 import org.mongodb.DBRef;
 import org.mongodb.Encoder;
+import org.mongodb.codecs.configuration.CodecRegistryBuilder;
 import org.mongodb.codecs.validators.QueryFieldNameValidator;
 
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class EncoderRegistry {
 
     @SuppressWarnings("rawtypes")
     public Encoder getDefaultEncoder() {
-        return (Encoder) new DocumentCodec(primitiveCodecs, defaultValidator, this);
+        return (Encoder) new DocumentCodec(CodecRegistryBuilder.getDefault(), defaultValidator);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"}) //not cool

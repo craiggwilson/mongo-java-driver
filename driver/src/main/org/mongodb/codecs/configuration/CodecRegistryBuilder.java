@@ -6,6 +6,10 @@ import org.mongodb.CodecRegistry;
 import java.util.ArrayList;
 
 public class CodecRegistryBuilder {
+    private static final CodecRegistry defaultRegistry = new CodecRegistryBuilder()
+                                                                    .addSource(new PrimitiveCodecSource())
+                                                                    .build();
+
     private final ArrayList<CodecSource> sources = new ArrayList<CodecSource>();
 
     public CodecRegistryBuilder addSource(final CodecSource source) {
@@ -25,6 +29,10 @@ public class CodecRegistryBuilder {
 
     public CodecRegistry build() {
         return new CodecRegistryImpl(sources);
+    }
+
+    public static CodecRegistry getDefault() {
+        return defaultRegistry;
     }
 
     private static class CodecRegistryCodecSourceAdapter implements CodecSource {
